@@ -5,8 +5,8 @@ import { ITodo } from 'src/types'
 import { createStore, createEvent } from 'effector'
 import { useStore } from 'effector-react'
 
-export const todoChange = createEvent<string>('todoChange')
-const todoFormStore = createStore('').on(todoChange, (_, value) => value)
+export const todoInputChange = createEvent<string>('todoInputChange')
+const todoFormStore = createStore('').on(todoInputChange, (_, value) => value)
 const useTodoFormStore = () => useStore(todoFormStore)
 
 interface TodoFormProps {
@@ -14,19 +14,20 @@ interface TodoFormProps {
 }
 
 export const TodoForm: React.FC<TodoFormProps> = ({ onSubmit }) => {
+  const todoValue = useTodoFormStore()
+
   const handleSubmit = useCallback(
     e => {
       e.preventDefault()
-      onSubmit('new todo')
+      onSubmit(todoValue)
+      todoInputChange('')
     },
-    [onSubmit]
+    [onSubmit, todoValue]
   )
-
-  const todoValue = useTodoFormStore()
 
   return (
     <form onSubmit={handleSubmit}>
-      <TodoInput value={todoValue} onChange={todoChange} />
+      <TodoInput value={todoValue} onChange={todoInputChange} />
       <SubmitButton title="submit" />
     </form>
   )

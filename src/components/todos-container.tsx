@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
-import { createStore, createEffect } from 'effector'
+import { createStore, createEffect, createEvent } from 'effector'
 import { useStore } from 'effector-react'
-import { TodoList, TodoForm } from 'src/components'
+import { TodoList, TodoForm, TodosLayout } from 'src/components'
 import { ITodo } from 'src/types'
 import { getMockTodos } from 'src/get-mock-todos'
 
@@ -15,11 +15,26 @@ const getTodos = createEffect<void, ITodo[]>('getTodos').use(() => {
   return getMockTodos()
 })
 
+const createTodo = createEvent<ITodo['title']>('createTodo')
+
 const todosStore = createStore<ITodosStore>({
   loading: false,
   error: false,
   todos: [],
 })
+  .on(createTodo, (state, value) => {
+    const newTodo: ITodo = {
+      completed: false,
+      id: Math.random(),
+      title: value,
+    }
+    const updatedTodos = [...state.todos, newTodo]
+
+    return {
+      ...state,
+      todos: updatedTodos,
+    }
+  })
   .on(getTodos, state => ({
     ...state,
     loading: true,
@@ -47,9 +62,9 @@ export const TodosContainer = () => {
   if (error) return <div>Error!</div>
 
   return (
-    <div>
-      <TodoForm onSubmit={console.log} />
-      <TodoList todos={todos} />
-    </div>
+    <TodosLayout
+      todosFormElement={<TodoForm onSubmit={createTodo} />}
+      todosListElement={<TodoList todos={todos} />}
+    />
   )
 }

@@ -11,5 +11,12 @@ export const TodoInput: React.FC<TodoInputProps> = ({ value, onChange }) => {
     [onChange]
   )
 
-  return <input type="text" value={value} onChange={handleChange} />
+  return (
+    <input
+      type="text"
+      placeholder="Type something..."
+      value={value}
+      onChange={handleChange}
+    />
+  )
 }
