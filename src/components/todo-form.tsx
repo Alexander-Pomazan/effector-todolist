@@ -2,6 +2,13 @@ import React, { useCallback } from 'react'
 import { SubmitButton, TodoInput } from 'src/components'
 import { ITodo } from 'src/types'
 
+import { createStore, createEvent } from 'effector'
+import { useStore } from 'effector-react'
+
+export const todoChange = createEvent<string>('todoChange')
+const todoFormStore = createStore('').on(todoChange, (_, value) => value)
+const useTodoFormStore = () => useStore(todoFormStore)
+
 interface TodoFormProps {
   onSubmit: (todoTitle: ITodo['title']) => void
 }
@@ -15,10 +22,12 @@ export const TodoForm: React.FC<TodoFormProps> = ({ onSubmit }) => {
     [onSubmit]
   )
 
+  const todoValue = useTodoFormStore()
+
   return (
     <form onSubmit={handleSubmit}>
-      <TodoInput value="new todo" onChange={console.log} />
-      <SubmitButton title="submit"></SubmitButton>
+      <TodoInput value={todoValue} onChange={todoChange} />
+      <SubmitButton title="submit" />
     </form>
   )
 }
